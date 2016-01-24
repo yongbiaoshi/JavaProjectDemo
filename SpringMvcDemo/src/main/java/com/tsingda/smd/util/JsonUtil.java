@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
@@ -83,10 +84,12 @@ public class JsonUtil {
         u.setAddress("八大胡同");
         System.out.println(stringify(u));
 
-        String json = "{\"name\":\"王立博\",\"age\":18,\"min\":2,\"address\":null}";
+        String json = "{\"name\":\"王立博\",\"age\":0000018,\"min\":2,\"address\":null}";
         User r = parse(json, User.class);
         System.out.println(r.getAddress() == null);
         logger.debug("User is : {}", r);
+        
+        Assert.notNull(null);
         
         ArrayType t = constructArrayType(User.class);
         System.out.println(stringify(t));

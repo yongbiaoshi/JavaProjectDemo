@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
@@ -69,4 +71,10 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         converters.add(jsonMessageConverter);
     }
 
+    @Override
+    public Validator getValidator() {
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        return validator;
+    }
+    
 }

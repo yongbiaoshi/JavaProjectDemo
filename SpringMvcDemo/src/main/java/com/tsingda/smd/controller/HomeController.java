@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.tsingda.smd.model.User;
+
 /**
  * Handles requests for the application home page.
  */
@@ -55,6 +57,11 @@ public class HomeController {
 	@RequestMapping(value = "/str", method = RequestMethod.GET)
     public @ResponseBody String str(Locale locale, Model model) {
         logger.info("Welcome home! The client locale is {}.", locale);
+        return "我想吃早饭……";
+    }
+	
+	@RequestMapping(value = "/u")
+    public @ResponseBody String u(User user) {
         return "我想吃早饭……";
     }
 }
