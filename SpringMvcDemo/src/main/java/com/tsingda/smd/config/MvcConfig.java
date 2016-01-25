@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
@@ -70,11 +71,10 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
                 JsonUtil.objectMapper);
         converters.add(jsonMessageConverter);
     }
-
-    @Override
-    public Validator getValidator() {
+    
+    @Bean
+    public Validator initValidatorFactoryBean(){
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         return validator;
-    }
-    
+    }    
 }

@@ -6,15 +6,20 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.validation.groups.Default;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.tsingda.smd.model.User;
+import com.tsingda.smd.model.ValidatorGroups;
 
 /**
  * Handles requests for the application home page.
@@ -61,7 +66,10 @@ public class HomeController {
     }
 	
 	@RequestMapping(value = "/u")
-    public @ResponseBody String u(User user) {
-        return "我想吃早饭……";
+    public @ResponseBody Object u(@Validated({Default.class, ValidatorGroups.UserAdd.class}) User user, BindingResult result) {
+	    if(result.hasErrors()){
+	        return result.getFieldErrors();
+	    }
+        return user;
     }
 }
