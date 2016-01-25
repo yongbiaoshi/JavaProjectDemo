@@ -1,11 +1,13 @@
 package com.tsingda.smd.controller;
 
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.groups.Default;
 
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.tsingda.smd.config.NotFoundException;
 import com.tsingda.smd.model.User;
 import com.tsingda.smd.model.ValidatorGroups;
 
@@ -46,6 +49,17 @@ public class HomeController {
 		return "home";
 	}
 	
+	/**
+	 * 拦截所有没有对应Controller的请求
+	 * @param request HttpServletRequest
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "*/**", method = RequestMethod.GET)
+    public void notFoundRequestMapping(HttpServletRequest request) throws NotFoundException {
+	    logger.error("页面不存在，URI：{}", request.getRequestURI());
+	    throw NotFoundException.getInstance();
+    }
+	
 	@RequestMapping(value = "/json", method = RequestMethod.GET)
     public @ResponseBody Map<String, Object> json(Locale locale, Model model) {
         logger.info("Welcome home! The client locale is {}.", locale);
@@ -60,7 +74,7 @@ public class HomeController {
     }
 	
 	@RequestMapping(value = "/str", method = RequestMethod.GET)
-    public @ResponseBody String str(Locale locale, Model model) {
+    public @ResponseBody String str(Locale locale, Model model) throws SQLException {
         logger.info("Welcome home! The client locale is {}.", locale);
         return "我想吃早饭……";
     }

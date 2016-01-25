@@ -3,6 +3,7 @@ package com.tsingda.smd.config;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -13,16 +14,19 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 import com.tsingda.smd.util.JsonUtil;
 
@@ -71,10 +75,29 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
                 JsonUtil.objectMapper);
         converters.add(jsonMessageConverter);
     }
-    
+
+    /**
+     * 配置异常处理
+     */
+    @Override
+    public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+        super.configureHandlerExceptionResolvers(exceptionResolvers);
+        SimpleMappingExceptionResolver exceptionResolver = new SimpleMappingExceptionResolver();
+        //设置默认错误码
+        exceptionResolver.setDefaultStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        //设置默认错误页面
+        exceptionResolver.setDefaultErrorView("error/500");
+        //添加特定异常对应的错误页面  e.g. java.sql.SQLException、java.io.IOException、java.lang.Exception、java.lang.Throwable
+        Properties mappings = new Properties();
+        mappings.put("com.tsingda.smd.config.NotFoundException", "error/404");
+        mappings.put("java.sql.SQLException", "error/sqlException");
+        exceptionResolver.setExceptionMappings(mappings);
+        exceptionResolvers.add(exceptionResolver);
+    }
+
     @Bean
-    public Validator initValidatorFactoryBean(){
+    public Validator initValidatorFactoryBean() {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         return validator;
-    }    
+    }
 }

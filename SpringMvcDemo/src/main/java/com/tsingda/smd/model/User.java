@@ -6,9 +6,10 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.Range;
 
 public class User {
-    @NotBlank(groups={ValidatorGroups.UserAdd.class})
+    @NotBlank(groups = { ValidatorGroups.UserAdd.class })
     @Size(max = 50, min = 6)
     private String name;
+    
     @Range(max = 100, min = 18)
     private int age;
 
@@ -37,6 +38,5 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
-    
-}
 
+}
