@@ -91,7 +91,10 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         Properties mappings = new Properties();
         mappings.put("com.tsingda.smd.config.NotFoundException", "error/404");
         mappings.put("java.sql.SQLException", "error/sqlException");
+        mappings.put("java.lang.Exception", "error/500");
+        mappings.put("java.lang.Throwable", "error/500");
         exceptionResolver.setExceptionMappings(mappings);
+        
         exceptionResolvers.add(exceptionResolver);
     }
 

@@ -25,6 +25,21 @@
     <logger name="com.tsingda.smd" level="DEBUG">
         <appender-ref ref="FILE" />
     </logger>
+    <logger name="org.springframework.core" level="DEBUG">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.beans" level="DEBUG">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.context" level="DEBUG">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.web" level="DEBUG">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.security" level="DEBUG">
+        <appender-ref ref="FILE" />
+    </logger>
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />

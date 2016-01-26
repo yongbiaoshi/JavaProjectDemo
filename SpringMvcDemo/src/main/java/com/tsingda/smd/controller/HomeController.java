@@ -1,6 +1,5 @@
 package com.tsingda.smd.controller;
 
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -56,6 +55,7 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "*/**")
     public void notFoundRequestMapping(HttpServletRequest request) throws NotFoundException {
+	    System.out.println("+++++++++++++++++++++++++++++++++");
 	    logger.error("页面不存在，URI：{}", request.getRequestURI());
 	    throw NotFoundException.getInstance();
     }
@@ -74,9 +74,14 @@ public class HomeController {
     }
 	
 	@RequestMapping(value = "/str", method = RequestMethod.GET)
-    public @ResponseBody String str(Locale locale, Model model) throws SQLException {
+    public @ResponseBody String str(Locale locale, Model model) {
         logger.info("Welcome home! The client locale is {}.", locale);
         return "我想吃早饭……";
+    }
+	
+	@RequestMapping(value = "/exception")
+    public void exception(Locale locale, Model model) {
+        throw new NullPointerException("测试异常");
     }
 	
 	@RequestMapping(value = "/u")
