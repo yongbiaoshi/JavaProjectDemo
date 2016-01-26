@@ -61,6 +61,12 @@ public class HomeController {
 	    throw NotFoundException.getInstance();
     }
 	
+	/**
+	 * 测试Json格式返回值
+	 * @param locale locale
+	 * @param model model
+	 * @return a map for test
+	 */
 	@RequestMapping(value = "/json", method = RequestMethod.GET)
     public @ResponseBody Map<String, Object> json(Locale locale, Model model) {
         logger.info("Welcome home! The client locale is {}.", locale);
