@@ -24,7 +24,9 @@ import com.tsingda.smd.model.User;
 import com.tsingda.smd.model.ValidatorGroups;
 
 /**
- * Handles requests for the application home page.
+ * 一些基本的验证请求
+ * @author Administrator
+ *
  */
 @Controller
 public class HomeController {
