@@ -72,16 +72,16 @@ public class HomeController {
         return r;
     }
 	
-	@RequestMapping(value = "/str", method = RequestMethod.GET)
-    public @ResponseBody String str(Locale locale, Model model) {
-        logger.info("Welcome home! The client locale is {}.", locale);
-        return "我想吃早饭……";
-    }
-	
 	@RequestMapping(value = "/exception")
     public void exception(Locale locale, Model model) {
         throw new NullPointerException("测试异常");
     }
+	
+	@RequestMapping(value = "/str", method = RequestMethod.GET)
+	public @ResponseBody String str(Locale locale, Model model) {
+	    logger.info("Welcome home! The client locale is {}.", locale);
+	    return "我想吃早饭……";
+	}
 	
 	@RequestMapping(value = "/u")
     public @ResponseBody Object u(@Validated({Default.class, ValidatorGroups.UserAdd.class}) User user, BindingResult result) {
