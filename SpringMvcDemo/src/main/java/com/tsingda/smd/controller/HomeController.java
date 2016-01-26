@@ -55,7 +55,6 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "*/**")
     public void notFoundRequestMapping(HttpServletRequest request) throws NotFoundException {
-	    System.out.println("+++++++++++++++++++++++++++++++++");
 	    logger.error("页面不存在，URI：{}", request.getRequestURI());
 	    throw NotFoundException.getInstance();
     }
