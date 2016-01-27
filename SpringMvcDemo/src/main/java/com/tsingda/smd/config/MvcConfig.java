@@ -1,13 +1,17 @@
 package com.tsingda.smd.config;
 
 import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.hibernate.validator.HibernateValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -15,19 +19,22 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.validation.Validator;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.OptionalValidatorFactoryBean;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tsingda.smd.util.JsonUtil;
 
 @Configuration
@@ -37,8 +44,17 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     private final static Logger logger = LoggerFactory.getLogger(MvcConfig.class);
 
-    private final static MediaType TEXT_PLAIN_UTF8 = new MediaType("text", "plain", Charset.forName("UTF-8"));
-    private final static MediaType TEXT_HTML_UTF8 = new MediaType("text", "html", Charset.forName("UTF-8"));
+    private final static String DEFAULT_CHARSET_VALUE = "UTF-8";
+    private final static Charset DEFAULT_CHARSET = Charset.forName(DEFAULT_CHARSET_VALUE);
+
+    private final static MediaType TEXT_PLAIN_UTF8 = new MediaType("text", "plain", DEFAULT_CHARSET);
+    private final static MediaType TEXT_HTML_UTF8 = new MediaType("text", "html", DEFAULT_CHARSET);
+
+    /**
+     * Bean Validation Messages 缓存时间
+     */
+    private final static int VALIDATION_MESSAGES_CACHE_SECONS = 60;
+
     private final MappingJackson2HttpMessageConverter jsonMessageConverter = new MappingJackson2HttpMessageConverter(
             JsonUtil.objectMapper);
 
@@ -66,7 +82,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
         // StringHttpMessageConverter 配置
         // 设置Stringodgar返回Content-Type:text/plain;charset=UTF-8、Content-Type:text/html;charset=UTF-8
-        StringHttpMessageConverter stringMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
+        StringHttpMessageConverter stringMessageConverter = new StringHttpMessageConverter(DEFAULT_CHARSET);
         stringMessageConverter.setWriteAcceptCharset(false);
         List<MediaType> types = new ArrayList<MediaType>();
         types.add(TEXT_PLAIN_UTF8);
@@ -92,12 +108,11 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         // 添加特定异常对应的错误页面 e.g.
         // java.sql.SQLException、java.io.IOException、java.lang.Exception、java.lang.Throwable
         Properties mappings = new Properties();
-        mappings.put("org.springframework.web.servlet.NoHandlerFoundException", "error/404");
-        mappings.put("java.sql.SQLException", "error/sqlException");
-        mappings.put("java.lang.Exception", "error/500");
-        mappings.put("java.lang.Throwable", "error/500");
+        mappings.put(NoHandlerFoundException.class.getName(), "error/404");
+        mappings.put(SQLException.class.getName(), "error/sqlException");
+        mappings.put(Exception.class.getName(), "error/500");
+        mappings.put(Throwable.class.getName(), "error/500");
         exceptionResolver.setExceptionMappings(mappings);
-
         Properties exceptionStatusMappings = new Properties();
         exceptionStatusMappings.put("org.springframework.web.servlet.NoHandlerFoundException",
                 HttpServletResponse.SC_NOT_FOUND);
@@ -107,9 +122,20 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         exceptionResolvers.add(exceptionResolver);
     }
 
-    @Bean
-    public Validator initValidatorFactoryBean() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+    @Override
+    public Validator getValidator() {
+        OptionalValidatorFactoryBean validator = new OptionalValidatorFactoryBean();
+        validator.setProviderClass(HibernateValidator.class);
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setDefaultEncoding(DEFAULT_CHARSET_VALUE);
+        messageSource.setCacheSeconds(VALIDATION_MESSAGES_CACHE_SECONS);
+
+        String userValidationMessages = "UserValidationMessages";
+        String orderValidationMessages = "OrderValidationMessages";
+        String commonValidationMessages = "CommonValidationMessages";
+        messageSource.setBasenames(userValidationMessages, orderValidationMessages, commonValidationMessages);
+        validator.setValidationMessageSource(messageSource);
         return validator;
     }
+
 }

@@ -86,7 +86,7 @@ public class HomeController {
     @RequestMapping(value = "/u")
     public @ResponseBody Object u(@Validated({ Default.class, ValidatorGroups.UserAdd.class }) User user,
             BindingResult result) {
-        System.out.println(1/0);
+//        System.out.println(1/0);
         if (result.hasErrors()) {
             return result.getFieldErrors();
         }
