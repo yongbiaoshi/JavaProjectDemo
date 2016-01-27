@@ -37,6 +37,11 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     private final static Logger logger = LoggerFactory.getLogger(MvcConfig.class);
 
+    private final static MediaType TEXT_PLAIN_UTF8 = new MediaType("text", "plain", Charset.forName("UTF-8"));
+    private final static MediaType TEXT_HTML_UTF8 = new MediaType("text", "html", Charset.forName("UTF-8"));
+    private final MappingJackson2HttpMessageConverter jsonMessageConverter = new MappingJackson2HttpMessageConverter(
+            JsonUtil.objectMapper);
+
     public MvcConfig() {
         super();
         logger.debug("==========MvcConfig init=================");
@@ -63,17 +68,13 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         // 设置Stringodgar返回Content-Type:text/plain;charset=UTF-8、Content-Type:text/html;charset=UTF-8
         StringHttpMessageConverter stringMessageConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
         stringMessageConverter.setWriteAcceptCharset(false);
-        MediaType textPlainType = new MediaType("text", "plain", Charset.forName("UTF-8"));
-        MediaType textHtmlType = new MediaType("text", "html", Charset.forName("UTF-8"));
         List<MediaType> types = new ArrayList<MediaType>();
-        types.add(textPlainType);
-        types.add(textHtmlType);
+        types.add(TEXT_PLAIN_UTF8);
+        types.add(MediaType.APPLICATION_JSON_UTF8);
+        types.add(TEXT_HTML_UTF8);
         stringMessageConverter.setSupportedMediaTypes(types);
         converters.add(stringMessageConverter);
-
-        HttpMessageConverter<Object> jsonMessageConverter = new MappingJackson2HttpMessageConverter(
-                JsonUtil.objectMapper);
-        converters.add(jsonMessageConverter);
+        converters.add(this.jsonMessageConverter);
     }
 
     /**
@@ -83,6 +84,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         super.configureHandlerExceptionResolvers(exceptionResolvers);
         MyExceptionResolver exceptionResolver = new MyExceptionResolver();
+        exceptionResolver.setJsonMessageConverter(this.jsonMessageConverter);
         // 设置默认错误码
         exceptionResolver.setDefaultStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         // 设置默认错误页面
@@ -95,12 +97,13 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         mappings.put("java.lang.Exception", "error/500");
         mappings.put("java.lang.Throwable", "error/500");
         exceptionResolver.setExceptionMappings(mappings);
-        
+
         Properties exceptionStatusMappings = new Properties();
-        exceptionStatusMappings.put("org.springframework.web.servlet.NoHandlerFoundException", HttpServletResponse.SC_NOT_FOUND);
+        exceptionStatusMappings.put("org.springframework.web.servlet.NoHandlerFoundException",
+                HttpServletResponse.SC_NOT_FOUND);
         exceptionStatusMappings.put("java.lang.Exception", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         exceptionResolver.setExceptionCodeMapping(exceptionStatusMappings);
-        
+
         exceptionResolvers.add(exceptionResolver);
     }
 
