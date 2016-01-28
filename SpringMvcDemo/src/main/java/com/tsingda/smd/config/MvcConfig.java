@@ -1,11 +1,10 @@
 package com.tsingda.smd.config;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -19,14 +18,24 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.core.io.PathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.feed.AtomFeedHttpMessageConverter;
+import org.springframework.http.converter.feed.RssChannelHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
+import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.OptionalValidatorFactoryBean;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -34,7 +43,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tsingda.smd.util.JsonUtil;
 
 @Configuration
@@ -76,11 +84,18 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
                 .setCacheControl(CacheControl.maxAge(10, TimeUnit.MINUTES).cachePublic());
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         super.configureMessageConverters(converters);
 
         // StringHttpMessageConverter 配置
+        converters.add(new ByteArrayHttpMessageConverter());
+        converters.add(new FormHttpMessageConverter());
+        converters.add(new Jaxb2RootElementHttpMessageConverter());
+        converters.add(new SourceHttpMessageConverter());
+        converters.add(new AtomFeedHttpMessageConverter());
+        converters.add(new RssChannelHttpMessageConverter());
         // 设置Stringodgar返回Content-Type:text/plain;charset=UTF-8、Content-Type:text/html;charset=UTF-8
         StringHttpMessageConverter stringMessageConverter = new StringHttpMessageConverter(DEFAULT_CHARSET);
         stringMessageConverter.setWriteAcceptCharset(false);
@@ -91,6 +106,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         stringMessageConverter.setSupportedMediaTypes(types);
         converters.add(stringMessageConverter);
         converters.add(this.jsonMessageConverter);
+
     }
 
     /**
@@ -126,7 +142,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     public Validator getValidator() {
         OptionalValidatorFactoryBean validator = new OptionalValidatorFactoryBean();
         validator.setProviderClass(HibernateValidator.class);
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setDefaultEncoding(DEFAULT_CHARSET_VALUE);
         messageSource.setCacheSeconds(VALIDATION_MESSAGES_CACHE_SECONS);
 
@@ -136,6 +152,15 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         messageSource.setBasenames(userValidationMessages, orderValidationMessages, commonValidationMessages);
         validator.setValidationMessageSource(messageSource);
         return validator;
+    }
+
+    @Bean
+    public MultipartResolver multipartResolver() throws IOException {
+        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+        resolver.setMaxUploadSizePerFile(10 * 1024 * 1024);
+        Resource uploadTempDir = new PathResource("updaload_file_temp");
+        resolver.setUploadTempDir(uploadTempDir);
+        return new CommonsMultipartResolver();
     }
 
 }

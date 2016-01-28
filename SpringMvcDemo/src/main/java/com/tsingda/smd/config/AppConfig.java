@@ -1,28 +1,30 @@
 package com.tsingda.smd.config;
 
+import java.io.IOException;
+
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 @Configuration
-@PropertySource(value = { "classpath:jdbc.properties", "classpath:app.properties" })
+@PropertySource(value = { "classpath:jdbc.properties" })
 public class AppConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(AppConfig.class);
 
     @Value(value = "${db.name}")
     private String dbName;
-
-    @Value(value = "${app.name}")
-    private String appName;
 
     @Autowired
     Environment env;
@@ -31,17 +33,24 @@ public class AppConfig {
         logger.debug("==========AppConfig init==========");
     }
 
+    @PostConstruct
+    public void printConfigInfo() {
+        logger.debug("配置信息：{}", env);
+    }
+
+    @Bean(name = "appProperties")
+    public static PropertiesFactoryBean propertiesFactoryBean() throws IOException {
+        PropertiesFactoryBean bean = new PropertiesFactoryBean();
+        Resource location = new ClassPathResource("app.properties");
+        bean.setLocations(location);
+        bean.setSingleton(true);
+        return bean;
+    }
+    
     @Bean
     public static PropertySourcesPlaceholderConfigurer loadPropertySource() {
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
         return configurer;
-    }
-    
-    @PostConstruct
-    public void printConfigInfo() {
-        logger.debug("db.name:{}", env.getProperty("db.name"));
-        logger.debug("db.name:{}", dbName);
-        logger.debug("app.name:{}", appName);
     }
 
 }

@@ -44,11 +44,15 @@
             <param-name>contextConfigLocation</param-name>
             <param-value>com.tsingda.smd.config.MvcConfig</param-value>
         </init-param>
+        
+        <!-- 支持异步 -->
+        <async-supported>true</async-supported>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
+    
 
 </web-app>
