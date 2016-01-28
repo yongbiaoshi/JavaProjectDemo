@@ -1,6 +1,5 @@
 package com.tsingda.smd.config;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,14 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.hibernate.validator.HibernateValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.core.io.PathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -34,8 +30,6 @@ import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConvert
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.OptionalValidatorFactoryBean;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -62,6 +56,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
      * Bean Validation Messages 缓存时间
      */
     private final static int VALIDATION_MESSAGES_CACHE_SECONS = 60;
+
 
     private final MappingJackson2HttpMessageConverter jsonMessageConverter = new MappingJackson2HttpMessageConverter(
             JsonUtil.objectMapper);
@@ -152,15 +147,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         messageSource.setBasenames(userValidationMessages, orderValidationMessages, commonValidationMessages);
         validator.setValidationMessageSource(messageSource);
         return validator;
-    }
-
-    @Bean
-    public MultipartResolver multipartResolver() throws IOException {
-        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-        resolver.setMaxUploadSizePerFile(10 * 1024 * 1024);
-        Resource uploadTempDir = new PathResource("updaload_file_temp");
-        resolver.setUploadTempDir(uploadTempDir);
-        return new CommonsMultipartResolver();
     }
 
 }

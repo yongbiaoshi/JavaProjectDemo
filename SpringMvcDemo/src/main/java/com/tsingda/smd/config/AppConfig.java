@@ -1,8 +1,10 @@
 package com.tsingda.smd.config;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 @Configuration
 @PropertySource(value = { "classpath:jdbc.properties" })
@@ -25,6 +30,9 @@ public class AppConfig {
 
     @Value(value = "${db.name}")
     private String dbName;
+
+    @Value(value = "#{appProperties['app.upload.file.temp']}")
+    private String uploadFileTemp;
 
     @Autowired
     Environment env;
@@ -46,11 +54,24 @@ public class AppConfig {
         bean.setSingleton(true);
         return bean;
     }
-    
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer loadPropertySource() {
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
         return configurer;
+    }
+
+    @Bean
+    public MultipartResolver multipartResolver(ServletContext context) throws IOException {
+        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+        resolver.setMaxUploadSizePerFile(10 * 1024 * 1024);
+        File uploadTempDir = new File(context.getRealPath("/") + uploadFileTemp);
+        if(!uploadTempDir.exists()){
+            uploadTempDir.mkdir();
+        }
+        System.out.println(uploadTempDir.getAbsolutePath());
+        resolver.setUploadTempDir(new FileSystemResource(uploadTempDir));
+        return new CommonsMultipartResolver();
     }
 
 }
