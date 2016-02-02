@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
@@ -23,13 +23,10 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 @Configuration
-@PropertySource(value = { "classpath:jdbc.properties" })
+@Import(value = { DataSourceConfig.class })
 public class AppConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(AppConfig.class);
-
-    @Value(value = "${db.name}")
-    private String dbName;
 
     @Value(value = "#{appProperties['app.upload.file.temp']}")
     private String uploadFileTemp;
@@ -61,11 +58,12 @@ public class AppConfig {
         return configurer;
     }
 
+
     @Bean
     public MultipartResolver multipartResolver(ServletContext context) throws IOException {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
         resolver.setResolveLazily(true);
-//        resolver.setMaxUploadSizePerFile(5 * 10 * 1024 * 1024);
+        // resolver.setMaxUploadSizePerFile(5 * 10 * 1024 * 1024);
         resolver.setMaxUploadSize(100 * 1024 * 1024);
         File uploadTempDir = new File(context.getRealPath("/") + uploadFileTemp);
         resolver.setUploadTempDir(new FileSystemResource(uploadTempDir));
