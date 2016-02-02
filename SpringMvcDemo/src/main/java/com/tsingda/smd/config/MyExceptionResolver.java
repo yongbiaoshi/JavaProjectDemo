@@ -13,6 +13,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
@@ -30,27 +31,22 @@ public class MyExceptionResolver extends SimpleMappingExceptionResolver {
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler,
             Exception ex) {
         logger.error("异常信息：", ex);
-        if (isResponseBodyHandlerMethod(handler) || AjaxUtil.isAjaxRequest(request)) {
+        JsonResponseData data = new JsonResponseData(false, "服务器错误，错误信息：" + ex.getMessage(), null);
+        if(ex instanceof MaxUploadSizeExceededException){
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            responseExceptionToJson(data, response);
+            return null;
+        }
+        if(isResponseBodyHandlerMethod(handler) || AjaxUtil.isAjaxRequest(request)){
             Integer statusCode = determineStatus(ex, request);
             if (statusCode != null) {
                 response.setStatus(statusCode);
-                response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-                JsonResponseData data = new JsonResponseData(false, "服务器错误", null);
-                try {
-                    jsonMessageConverter.write(data, MediaType.APPLICATION_JSON_UTF8, new ServletServerHttpResponse(response));
-                } catch (HttpMessageNotWritableException e) {
-                    logger.error("返回Json错误信息失败，错误信息：", e);
-                } catch (IOException e) {
-                    logger.error("返回Json错误信息失败，错误信息：", e);
-                }
             }
+            responseExceptionToJson(data, response);
             return new ModelAndView();
-        } else if (handler == null && AjaxUtil.isAjaxRequest(request)) {
-
-            return new ModelAndView();
-        } else {
-            return super.doResolveException(request, response, handler, ex);
         }
+        return super.doResolveException(request, response, handler, ex);
+        
     }
 
     public boolean isResponseBodyHandlerMethod(Object handler) {
@@ -78,7 +74,6 @@ public class MyExceptionResolver extends SimpleMappingExceptionResolver {
         } else {
             return this.defaultStatusCode;
         }
-
     }
 
     protected Integer findMatchingStatusCode(Properties exceptionStatusMapping, Exception ex) {
@@ -105,6 +100,16 @@ public class MyExceptionResolver extends SimpleMappingExceptionResolver {
 
     public void setJsonMessageConverter(MappingJackson2HttpMessageConverter jsonMessageConverter) {
         this.jsonMessageConverter = jsonMessageConverter;
+    }
+    
+    private void responseExceptionToJson(JsonResponseData data, HttpServletResponse response){
+        try {
+            jsonMessageConverter.write(data, MediaType.APPLICATION_JSON_UTF8, new ServletServerHttpResponse(response));
+        } catch (HttpMessageNotWritableException e) {
+            logger.error("返回Json错误信息失败，错误信息：", e);
+        } catch (IOException e) {
+            logger.error("返回Json错误信息失败，错误信息：", e);
+        }
     }
 
 }

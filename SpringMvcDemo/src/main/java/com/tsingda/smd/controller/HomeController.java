@@ -28,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import com.tsingda.smd.model.User;
@@ -138,5 +139,19 @@ public class HomeController {
         String attachmentHeaderValue = "form-data; name=\"attachment\"; filename=\"" + fileName + "\"";
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, attachmentHeaderValue);
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+    }
+    
+    @RequestMapping(value = "upload", method = RequestMethod.GET)
+    public String upload() {
+        return "upload";
+    }
+    
+    @RequestMapping(value = "upload", method = RequestMethod.POST)
+    public @ResponseBody String upload(MultipartFile file) throws IllegalStateException, IOException {
+        System.out.println(file.getName());
+        System.out.println(file.getSize());
+        System.out.println(file.getOriginalFilename());
+        file.transferTo(new File("D:/temp/" + file.getOriginalFilename()));
+        return "success";
     }
 }
