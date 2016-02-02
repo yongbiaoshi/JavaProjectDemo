@@ -64,8 +64,9 @@ public class AppConfig {
     @Bean
     public MultipartResolver multipartResolver(ServletContext context) throws IOException {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-        resolver.setMaxUploadSizePerFile(5 * 10 * 1024 * 1024);
-        resolver.setMaxUploadSize(10 * 1024 * 1024);
+        resolver.setResolveLazily(true);
+//        resolver.setMaxUploadSizePerFile(5 * 10 * 1024 * 1024);
+        resolver.setMaxUploadSize(100 * 1024 * 1024);
         File uploadTempDir = new File(context.getRealPath("/") + uploadFileTemp);
         resolver.setUploadTempDir(new FileSystemResource(uploadTempDir));
         return resolver;

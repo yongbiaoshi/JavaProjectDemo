@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.hibernate.validator.HibernateValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
@@ -29,16 +28,20 @@ import org.springframework.http.converter.feed.RssChannelHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.OptionalValidatorFactoryBean;
-import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.tsingda.smd.config.interceptor.FileUploadInterceptor;
 import com.tsingda.smd.util.JsonUtil;
 
 @Configuration
@@ -63,7 +66,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     private final MappingJackson2HttpMessageConverter jsonMessageConverter = new MappingJackson2HttpMessageConverter(
             JsonUtil.objectMapper);
     
-    public MvcConfig() {
+    public MvcConfig() {        
         super();
         logger.debug("==========MvcConfig init=================");
     }
@@ -113,7 +116,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         super.configureHandlerExceptionResolvers(exceptionResolvers);
         MyExceptionResolver exceptionResolver = new MyExceptionResolver();
-        exceptionResolver.setJsonMessageConverter(this.jsonMessageConverter);
         // 设置默认错误码
         exceptionResolver.setDefaultStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         // 设置默认错误页面
@@ -149,6 +151,14 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         messageSource.setBasenames(userValidationMessages, orderValidationMessages, commonValidationMessages);
         validator.setValidationMessageSource(messageSource);
         return validator;
+    }
+    
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        super.addInterceptors(registry);
+        FileUploadInterceptor fileUploadInterceptor = new FileUploadInterceptor();
+        fileUploadInterceptor.setMaxSize(10 * 1024 * 1024);
+        registry.addInterceptor(fileUploadInterceptor);
     }
 
 }
