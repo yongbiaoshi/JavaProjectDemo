@@ -25,11 +25,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -149,11 +147,7 @@ public class HomeController {
     }
     
     @RequestMapping(value = "upload", method = RequestMethod.POST)
-    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
-    public @ResponseBody Object upload(MaxUploadSizeExceededException ex, MultipartFile file) throws IllegalStateException, IOException {
-        if(ex != null){
-            return "too large file";
-        }
+    public @ResponseBody Object upload(MultipartFile file) throws IllegalStateException, IOException {
         System.out.println(file.getName());
         System.out.println(file.getSize());
         System.out.println(file.getOriginalFilename());

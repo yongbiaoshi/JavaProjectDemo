@@ -6,6 +6,7 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -15,10 +16,31 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import com.tsingda.smd.util.AjaxUtil;
 
+/**
+ * 自定义异常处理 继承{@link SimpleMappingExceptionResolver} ，并添加了Json类型的返回值 当请求为ajax请求或者
+ * handler 有@responsebody 注解时，出现异常，则返回Json类型的Response
+ * 
+ * @ClassName: MyExceptionResolver
+ * @Description: 自定义异常统一处理
+ * @author Administrator
+ * @date 2016年2月3日 上午9:19:02
+ * @see SimpleMappingExceptionResolver
+ */
 public class MyExceptionResolver extends SimpleMappingExceptionResolver {
 
+    /**
+     * 异常与status{@link HttpStatus}的对应状态
+     */
     private Properties exceptionStatusMapping;
+
+    /**
+     * 不做处理的异常类型
+     */
     private Class<?>[] excludedExceptions;
+
+    /**
+     * 默认Status，一般设置为500{@link HttpStatus#INTERNAL_SERVER_ERROR}
+     */
     private Integer defaultStatusCode;
 
     @Override
@@ -40,6 +62,13 @@ public class MyExceptionResolver extends SimpleMappingExceptionResolver {
 
     }
 
+    /**
+     * 判断handler是否有{@link ResponseBody}注解
+     * 
+     * @param handler
+     *            handler
+     * @return true or false
+     */
     public boolean isResponseBodyHandlerMethod(Object handler) {
         return handler != null && handler instanceof HandlerMethod
                 && ((HandlerMethod) handler).getMethodAnnotation(ResponseBody.class) != null;
@@ -49,6 +78,16 @@ public class MyExceptionResolver extends SimpleMappingExceptionResolver {
         this.exceptionStatusMapping = exceptionCodeMapping;
     }
 
+    /**
+     * 根据异常判断Status
+     *
+     * @see SimpleMappingExceptionResolver#determineStatusCode
+     * @param ex
+     *            异常
+     * @param request
+     *            http request
+     * @return http status code
+     */
     protected Integer determineStatus(Exception ex, HttpServletRequest request) {
         if (ex == null) {
             return null;
