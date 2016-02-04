@@ -26,7 +26,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import com.tsingda.smd.config.interceptor.FileUploadInterceptor;
 
 @Configuration
-@Import(value = { DataSourceConfig.class })
+@Import(value = { DataSourceConfig.class, MybatisConfig.class })
 public class AppConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(AppConfig.class);

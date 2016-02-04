@@ -58,12 +58,4 @@ public class DataSourceConfig {
         return manager;
     }
     
-    @Bean(name = "sessionFactory")
-    public SqlSessionFactoryBean sessionFactory(DataSource dataSource){
-        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource);
-        Resource configLocation = new ClassPathResource("mybatis.xml");
-        sessionFactory.setConfigLocation(configLocation );
-        return sessionFactory;
-    }
 }

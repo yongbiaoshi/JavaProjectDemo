@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.groups.Default;
 
@@ -22,17 +23,21 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import com.tsingda.smd.model.User;
 import com.tsingda.smd.model.ValidatorGroups;
+import com.tsingda.smd.service.UserService;
 
 /**
  * 一些基本的验证请求
@@ -49,6 +54,9 @@ public class HomeController {
 
     @Value(value = "#{appProperties['app.download.file.path']}")
     private String dowloadPath;
+
+    @Resource
+    private UserService userService;
 
     /**
      * Simply selects the home view to render by returning its name.
@@ -140,12 +148,12 @@ public class HomeController {
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, attachmentHeaderValue);
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
     }
-    
+
     @RequestMapping(value = "up", method = RequestMethod.GET)
     public String upload() {
         return "upload";
     }
-    
+
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     public @ResponseBody Object upload(MultipartFile file) throws IllegalStateException, IOException {
         System.out.println(file.getName());
@@ -153,5 +161,10 @@ public class HomeController {
         System.out.println(file.getOriginalFilename());
         file.transferTo(new File("D:/temp/" + file.getOriginalFilename()));
         return "success";
+    }
+
+    @RequestMapping(value = "user/{ids}", method = RequestMethod.GET)
+    public @ResponseBody User user(@PathVariable String ids) {
+        return userService.selectByPrimaryKey(ids);
     }
 }
