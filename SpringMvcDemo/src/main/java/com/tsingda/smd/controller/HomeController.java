@@ -167,4 +167,12 @@ public class HomeController {
     public @ResponseBody User user(@PathVariable String ids) {
         return userService.selectByPrimaryKey(ids);
     }
+    
+    @RequestMapping(value = "upuser/{ids}", method = RequestMethod.GET)
+    public @ResponseBody User updateUser(@PathVariable String ids) {
+        User user = userService.selectByPrimaryKey(ids);
+        user.setAge(21);
+        userService.updateByPrimaryKey(user);
+        return user;
+    }
 }

@@ -43,7 +43,9 @@ import com.tsingda.smd.util.JsonUtil;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "com.tsingda.smd", excludeFilters = @Filter(type = FilterType.REGEX, pattern = "com.tsingda.smd.config.*"))
+@ComponentScan(basePackages = "com.tsingda.smd", excludeFilters = {
+        @Filter(type = FilterType.REGEX, pattern = "com.tsingda.smd.config.*"),
+        @Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Service.class) })
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
     private final static Logger logger = LoggerFactory.getLogger(MvcConfig.class);
@@ -59,11 +61,10 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
      */
     private final static int VALIDATION_MESSAGES_CACHE_SECONS = 60;
 
-
     private final MappingJackson2HttpMessageConverter jsonMessageConverter = new MappingJackson2HttpMessageConverter(
             JsonUtil.objectMapper);
-    
-    public MvcConfig() {        
+
+    public MvcConfig() {
         super();
         logger.debug("==========MvcConfig init=================");
     }
@@ -149,7 +150,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         validator.setValidationMessageSource(messageSource);
         return validator;
     }
-    
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         super.addInterceptors(registry);

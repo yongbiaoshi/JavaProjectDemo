@@ -2,9 +2,11 @@ package com.tsingda.smd.config;
 
 import javax.sql.DataSource;
 
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.mapper.MapperFactoryBean;
+import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -15,25 +17,36 @@ import com.tsingda.smd.dao.UserMapper;
 @Configuration
 public class MybatisConfig {
 
-    @Bean(name = "sessionFactory")
-    public SqlSessionFactoryBean sessionFactory(DataSource dataSource) {
-        SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
-        sessionFactoryBean.setDataSource(dataSource);
+    @Bean
+    public SqlSessionFactoryBean sqlSessionFactoryBean(DataSource dataSource) {
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource);
         Resource configLocation = new ClassPathResource("mybatis.xml");
-        sessionFactoryBean.setConfigLocation(configLocation);
-        return sessionFactoryBean;
+        sqlSessionFactoryBean.setConfigLocation(configLocation);
+        SpringManagedTransactionFactory factory = new SpringManagedTransactionFactory();
+        sqlSessionFactoryBean.setTransactionFactory(factory);
+        return sqlSessionFactoryBean;
     }
 
-    @Bean(name = "sqlSession")
-    public SqlSessionTemplate sqlSession(SqlSessionFactoryBean sessionFactory) throws Exception {
-        return new SqlSessionTemplate(sessionFactory.getObject());
+    @Bean
+    public SqlSessionFactory sqlSessionFactory(SqlSessionFactoryBean sqlSessionFactoryBean) throws Exception {
+        return sqlSessionFactoryBean.getObject();
+    }
+
+    @Bean
+    public SqlSessionTemplate sqlSession(SqlSessionFactory sqlSessionFactory) throws Exception {
+        return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean(name = "userMapper")
-    public UserMapper userMapper(SqlSessionFactoryBean sessionFactory) throws Exception {
-        MapperFactoryBean<UserMapper> mapperFactory = new MapperFactoryBean<UserMapper>();
-        mapperFactory.setMapperInterface(UserMapper.class);
-        mapperFactory.setSqlSessionFactory(sessionFactory.getObject());
+    public UserMapper userMapper(SqlSessionFactory sqlSessionFactory) throws Exception {
+        return getMapper(sqlSessionFactory, UserMapper.class);
+    }
+
+    private <T> T getMapper(SqlSessionFactory sqlSessionFactory, Class<T> clazz) throws Exception {
+        MapperFactoryBean<T> mapperFactory = new MapperFactoryBean<T>();
+        mapperFactory.setMapperInterface(clazz);
+        mapperFactory.setSqlSessionFactory(sqlSessionFactory);
         return mapperFactory.getObject();
     }
 }

@@ -2,13 +2,14 @@ package com.tsingda.smd.service.impl;
 
 import javax.annotation.Resource;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tsingda.smd.dao.UserMapper;
 import com.tsingda.smd.model.User;
 import com.tsingda.smd.service.UserService;
 
-@Component
+@Service
 public class UserServiceImpl implements UserService {
 
     @Resource
@@ -39,9 +40,12 @@ public class UserServiceImpl implements UserService {
         return userMapper.updateByPrimaryKeySelective(record);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public int updateByPrimaryKey(User record) {
-        return userMapper.updateByPrimaryKey(record);
+        int i = userMapper.updateByPrimaryKey(record);
+        System.out.println(i/0);
+        return i;
     }
 
 }

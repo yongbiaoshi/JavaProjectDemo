@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -19,6 +20,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -26,7 +28,9 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import com.tsingda.smd.config.interceptor.FileUploadInterceptor;
 
 @Configuration
+@EnableTransactionManagement
 @Import(value = { DataSourceConfig.class, MybatisConfig.class })
+@ComponentScan(basePackages = "com.tsingda.smd")
 public class AppConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(AppConfig.class);
