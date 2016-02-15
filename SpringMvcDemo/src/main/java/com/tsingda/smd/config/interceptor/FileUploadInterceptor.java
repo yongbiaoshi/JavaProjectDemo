@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.tsingda.smd.util.JsonUtil;
+
 public class FileUploadInterceptor implements HandlerInterceptor {
     
     private final Logger logger = LoggerFactory.getLogger(FileUploadInterceptor.class);
@@ -27,8 +29,10 @@ public class FileUploadInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        logger.debug("-------------FileUploadInterceptor-----------------");
+        logger.debug("请求：{} 参数：{}", request.getRequestURI(), JsonUtil.stringify(request.getParameterMap()));
+        
         if (request != null && ServletFileUpload.isMultipartContent(request)) {
+            logger.debug("-------------FileUploadInterceptor-----------------");
             ServletRequestContext ctx = new ServletRequestContext(request);
             long requestSize = ctx.contentLength();
             logger.debug("MultipartContent, requestSize:{}, maxSize:{}, handler:{}", requestSize, this.maxSize, handler);

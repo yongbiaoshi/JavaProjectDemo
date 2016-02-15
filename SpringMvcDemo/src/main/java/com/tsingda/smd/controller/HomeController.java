@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.groups.Default;
 
@@ -23,15 +24,14 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -51,6 +51,9 @@ public class HomeController {
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
     @Autowired
     private Environment env;
+    
+    @Autowired
+    private ServletContext servletContext;
 
     @Value(value = "#{appProperties['app.download.file.path']}")
     private String dowloadPath;
@@ -126,15 +129,15 @@ public class HomeController {
 
     @RequestMapping(value = "/file")
     public StreamingResponseBody file(HttpServletResponse response) throws IOException {
-        File f = new File(dowloadPath + "test.png");
-        if (f == null || !f.exists() || f.isDirectory()) {
-            throw new FileNotFoundException("文件未找到：" + f.getAbsolutePath());
+        ServletContextResource sr = new ServletContextResource(servletContext, dowloadPath + "test.png");
+        if (!sr.exists() || sr.getFile().isDirectory()) {
+            throw new FileNotFoundException("文件未找到：" + sr.getPath());
         }
-        configFileResponseHeaders(response, f.getName());
+        configFileResponseHeaders(response, sr.getFilename());
         StreamingResponseBody streaming = new StreamingResponseBody() {
             @Override
             public void writeTo(OutputStream outputStream) throws IOException {
-                byte[] b = FileUtils.readFileToByteArray(f);
+                byte[] b = FileUtils.readFileToByteArray(sr.getFile());
                 outputStream.write(b);
                 outputStream.flush();
                 outputStream.close();
@@ -167,7 +170,7 @@ public class HomeController {
     public @ResponseBody User user(@PathVariable String ids) {
         return userService.selectByPrimaryKey(ids);
     }
-    
+
     @RequestMapping(value = "upuser/{ids}", method = RequestMethod.GET)
     public @ResponseBody User updateUser(@PathVariable String ids) {
         User user = userService.selectByPrimaryKey(ids);
