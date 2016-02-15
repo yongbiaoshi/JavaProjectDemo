@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -29,8 +28,7 @@ import com.tsingda.smd.config.interceptor.FileUploadInterceptor;
 
 @Configuration
 @EnableTransactionManagement
-@Import(value = { DataSourceConfig.class, MybatisConfig.class })
-@ComponentScan(basePackages = "com.tsingda.smd")
+@Import(value = { DataSourceConfig.class, MyBatisConfig.class })
 public class AppConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(AppConfig.class);
@@ -73,6 +71,7 @@ public class AppConfig {
     /**
      * propert sources 加载，实现在@Configuration 配置类中，可以用@Value来加载@PropertySource中的配置
      * 用法：在类型属性或者setter方法上面加注解 @Value("${db.driver}")
+     * 
      * @return
      */
     @Bean

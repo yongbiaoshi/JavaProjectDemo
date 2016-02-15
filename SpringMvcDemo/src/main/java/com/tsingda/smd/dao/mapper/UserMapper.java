@@ -1,4 +1,4 @@
-package com.tsingda.smd.dao;
+package com.tsingda.smd.dao.mapper;
 
 import com.tsingda.smd.model.User;
 

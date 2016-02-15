@@ -5,7 +5,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tsingda.smd.dao.UserMapper;
+import com.tsingda.smd.dao.mapper.UserMapper;
 import com.tsingda.smd.model.User;
 import com.tsingda.smd.service.UserService;
 
