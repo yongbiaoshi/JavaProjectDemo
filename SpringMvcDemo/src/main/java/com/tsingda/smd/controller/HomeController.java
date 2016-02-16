@@ -35,6 +35,8 @@ import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.tsingda.smd.model.User;
 import com.tsingda.smd.model.ValidatorGroups;
 import com.tsingda.smd.service.UserService;
@@ -51,7 +53,7 @@ public class HomeController {
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
     @Autowired
     private Environment env;
-    
+
     @Autowired
     private ServletContext servletContext;
 
@@ -167,8 +169,12 @@ public class HomeController {
     }
 
     @RequestMapping(value = "user/{ids}", method = RequestMethod.GET)
-    public @ResponseBody User user(@PathVariable String ids) {
-        return userService.selectByPrimaryKey(ids);
+    public @ResponseBody User user(@PathVariable String ids) throws JsonParseException, JsonMappingException, IOException {
+        User user = userService.selectByPrimaryKey(ids);
+        if (user != null) {
+            userService.saveToRedis(user);
+        }
+        return userService.selectFromRedis(user.getIds());
     }
 
     @RequestMapping(value = "upuser/{ids}", method = RequestMethod.GET)

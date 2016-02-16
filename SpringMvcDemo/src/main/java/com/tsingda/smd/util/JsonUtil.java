@@ -62,7 +62,11 @@ public class JsonUtil {
             JsonMappingException, IOException {
         return (T) objectMapper.readValue(json, typeReference);
     }
-
+    
+    public static <T> T changeType(Object obj, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException{
+        return parse(stringify(obj), clazz);
+    }
+    
     public static ArrayType constructArrayType(Class<?> elementType) {
         return typeFactory.constructArrayType(elementType);
     }
