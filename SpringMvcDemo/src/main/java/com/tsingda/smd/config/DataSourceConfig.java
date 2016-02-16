@@ -87,6 +87,8 @@ public class DataSourceConfig {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxWaitMillis(redisMaxWaitMillis);
         jedisConnectionFactory.setPoolConfig(poolConfig);
+        //生产环境去掉，测试只用一个DB就
+        jedisConnectionFactory.setDatabase(1);
         return jedisConnectionFactory;
     }
 
