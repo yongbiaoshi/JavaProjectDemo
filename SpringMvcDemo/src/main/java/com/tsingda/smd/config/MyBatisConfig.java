@@ -18,7 +18,7 @@ import org.springframework.web.context.support.ServletContextResourcePatternReso
 /**
  * MyBatis相关配置
  * @ClassName: MyBatisConfig 
- * @Description: TODO
+ * @Description: 配置MyBatis
  * @author Administrator
  * @date 2016年2月15日 下午1:53:33 
  *

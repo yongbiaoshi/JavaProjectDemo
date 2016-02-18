@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <property name="APP_Name" value="spring-mvc-demo" />
+    <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss" />
+    <contextName>${APP_Name}</contextName>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder 默认配置为PatternLayoutEncoder -->
+        <encoder>
+            <pattern>%d{YYYY-mm-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>D:/logs/smd.logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{YYYY-mm-dd HH:mm:ss.SSS} %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.tsingda.smd" level="DEBUG">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.core" level="INFO">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.beans" level="INFO">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.context" level="INFO">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.web" level="INFO">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.security" level="INFO">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="org.springframework.web.servlet.handler" level="debug">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>  

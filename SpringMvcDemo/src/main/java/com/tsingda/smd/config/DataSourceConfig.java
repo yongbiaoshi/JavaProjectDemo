@@ -23,7 +23,7 @@ import com.alibaba.druid.pool.DruidDataSourceFactory;
 import com.tsingda.smd.util.JsonUtil;
 
 @Configuration
-@PropertySource(value = { "classpath:jdbc.properties" })
+@PropertySource(value = { "classpath:${spring.profiles.active:dev}/jdbc.properties" })
 public class DataSourceConfig {
 
     @Value("${db.driver}")

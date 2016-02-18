@@ -2,6 +2,7 @@ package com.tsingda.smd.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
@@ -32,7 +34,9 @@ import com.tsingda.smd.config.interceptor.FileUploadInterceptor;
 public class AppConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(AppConfig.class);
-
+    private final static String DEFAULT_CHARSET_VALUE = "UTF-8";
+    @SuppressWarnings("unused")
+    private final static Charset DEFAULT_CHARSET = Charset.forName(DEFAULT_CHARSET_VALUE);
     /**
      * 文件上传的临时文件夹地址
      */
@@ -41,7 +45,7 @@ public class AppConfig {
 
     @Autowired
     Environment env;
-
+    
     public AppConfig() {
         logger.debug("==========AppConfig init==========");
     }
@@ -59,10 +63,28 @@ public class AppConfig {
      * @return
      * @throws IOException
      */
+    @Profile({ "dev" })
     @Bean(name = "appProperties")
-    public static PropertiesFactoryBean propertiesFactoryBean() throws IOException {
+    public PropertiesFactoryBean devPropertiesFactoryBean() throws IOException {
         PropertiesFactoryBean bean = new PropertiesFactoryBean();
-        Resource location = new ClassPathResource("app.properties");
+        Resource location = new ClassPathResource("dev/app.properties");
+        bean.setLocations(location);
+        bean.setSingleton(true);
+        return bean;
+    }
+    /**
+     * 加载基本配置
+     * 
+     * 使用方法：在类型属性上或者set方法上注解 @Value(value = "#{appProperties['配置的变量名']}")
+     * 
+     * @return
+     * @throws IOException
+     */
+    @Profile({ "production" })
+    @Bean(name = "appProperties")
+    public PropertiesFactoryBean productionPropertiesFactoryBean() throws IOException {
+        PropertiesFactoryBean bean = new PropertiesFactoryBean();
+        Resource location = new ClassPathResource("production/app.properties");
         bean.setLocations(location);
         bean.setSingleton(true);
         return bean;
@@ -98,7 +120,7 @@ public class AppConfig {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
         resolver.setResolveLazily(true);
         // resolver.setMaxUploadSizePerFile(5 * 10 * 1024 * 1024);
-
+        resolver.setDefaultEncoding(DEFAULT_CHARSET_VALUE);
         resolver.setMaxUploadSize(100 * 1024 * 1024);
         File uploadTempDir = new File(context.getRealPath("/") + uploadFileTemp);
         resolver.setUploadTempDir(new FileSystemResource(uploadTempDir));

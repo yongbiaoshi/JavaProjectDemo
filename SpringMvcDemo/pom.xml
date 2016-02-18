@@ -52,6 +52,12 @@
     </dependency>
 
     <!-- Logging -->
+    <dependency>
+      <groupId>org.logback-extensions</groupId>
+      <artifactId>logback-ext-spring</artifactId>
+      <version>0.1.4</version>
+    </dependency>
+
 
     <!-- @Inject -->
     <dependency>
@@ -155,11 +161,11 @@
       <artifactId>mybatis</artifactId>
       <version>3.2.7</version>
     </dependency>
-    
+
     <dependency>
-        <groupId>org.springframework.data</groupId>
-        <artifactId>spring-data-redis</artifactId>
-        <version>1.6.2.RELEASE</version>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-redis</artifactId>
+      <version>1.6.2.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>redis.clients</groupId>

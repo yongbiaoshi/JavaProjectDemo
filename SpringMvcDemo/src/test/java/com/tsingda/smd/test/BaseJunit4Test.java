@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -31,10 +32,11 @@ import com.tsingda.smd.util.JsonUtil;
 @WebAppConfiguration
 @Transactional("transactionManager")
 @Rollback(true)
+@ActiveProfiles({ "dev" })
 public class BaseJunit4Test extends AbstractTransactionalJUnit4SpringContextTests {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseJunit4Test.class); 
-    
+    private static final Logger logger = LoggerFactory.getLogger(BaseJunit4Test.class);
+
     @Resource
     UserMapper userMapper;
 
@@ -62,7 +64,7 @@ public class BaseJunit4Test extends AbstractTransactionalJUnit4SpringContextTest
 
         User ur = userMapper.selectByPrimaryKey(ids);
         logger.info(JsonUtil.stringify(ur));
-        
+
         int countAfter = JdbcTestUtils.countRowsInTable(jdbcTemplate, "user");
         logger.info("total count in user table : {}", countAfter);
     }

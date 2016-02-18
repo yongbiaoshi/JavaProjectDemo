@@ -2,6 +2,23 @@
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
+  <context-param>
+    <param-name>spring.profiles.active</param-name>
+    <!-- 设置为开发环境 -->
+    <param-value>dev</param-value>
+    <!-- 设置为生产环境 -->
+    <!-- <param-value>production</param-value> -->
+  </context-param>
+
+  <context-param>
+    <param-name>logbackConfigLocation</param-name>
+    <param-value>classpath:${spring.profiles.active}/logback.xml</param-value>
+  </context-param>
+
+  <listener>
+    <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
+  </listener>
+
   <!-- Configure ContextLoaderListener to use AnnotationConfigWebApplicationContext instead of the default XmlWebApplicationContext -->
   <context-param>
     <param-name>contextClass</param-name>
