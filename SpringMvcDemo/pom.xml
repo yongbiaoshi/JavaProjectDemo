@@ -10,6 +10,7 @@
   <properties>
     <java-version>1.8</java-version>
     <org.springframework-version>4.2.4.RELEASE</org.springframework-version>
+    <org.springframework.security-version>4.0.3.RELEASE</org.springframework.security-version>
     <org.aspectj-version>1.8.8</org.aspectj-version>
     <org.slf4j-version>1.7.12</org.slf4j-version>
   </properties>
@@ -175,6 +176,17 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+      <version>${org.springframework.security-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+      <version>${org.springframework.security-version}</version>
     </dependency>
   </dependencies>
   <build>

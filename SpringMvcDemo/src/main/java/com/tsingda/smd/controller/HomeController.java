@@ -184,4 +184,9 @@ public class HomeController {
         userService.updateByPrimaryKey(user);
         return user;
     }
+    
+    @RequestMapping(value = "login", method = RequestMethod.GET)
+    public String login() {
+        return "home";
+    }
 }
